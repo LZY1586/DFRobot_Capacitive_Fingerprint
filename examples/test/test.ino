@@ -35,6 +35,6 @@ void loop(){
 	  sensor.LEDCtrl(eLEDMode3, LEDGreen, 0);
 	  delay(1000);
 	  Serial.print("指纹注册成功，ID=");
-	  Serial.println(ret);
+	  Serial.println(ID);
   }
 }
