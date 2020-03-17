@@ -28,6 +28,7 @@
 #include <SoftwareSerial.h>
 
 //Open this macro to see the detailed running process of the program 
+#define ENABLE_DBG
 #ifdef ENABLE_DBG
 #define LDBG(...) if(dbg) {dbg->print("["); dbg->print(__FUNCTION__); dbg->print("(): "); dbg->print(__LINE__); dbg->print(" ] "); dbg->println(__VA_ARGS__);}
 #else
@@ -44,9 +45,7 @@ typedef struct{
   uint8_t   DID;
   uint16_t  CMD;
   uint16_t  LEN;
-  uint8_t payload[16];
-  uint16_t  CKS;
-  
+  uint8_t payload[0];
 }__attribute__ ((packed)) sCmdPacketHeader_t, *pCmdPacketHeader_t;
 
   /*
@@ -59,69 +58,40 @@ typedef struct{
   uint16_t  RCM;
   uint16_t  LEN;
   uint16_t  RET;
-  uint8_t   payload[14];
-  uint16_t  CKS;
-  
+  uint8_t   payload[0];
 }__attribute__ ((packed)) sRcmPacketHeader_t, *pRcmPacketHeader_t;
 
-  /*
-   命令数据包的帧结构
-  */
-typedef struct{
-  uint16_t  PREFIX;
-  uint8_t   SID;
-  uint8_t   DID;
-  uint16_t  CMD;
-  uint16_t  LEN;
-  uint16_t  CKS;
-  uint8_t payload[0];
-}__attribute__ ((packed)) sCmdDataPacketHeader_t, *pCmdDataPacketHeader_t;
 
-  /*
-   响应数据包的帧结构
-  */
-typedef struct{
-  uint16_t  PREFIX;
-  uint8_t   SID;
-  uint8_t   DID;
-  uint16_t  RCM;
-  uint16_t  LEN;
-  uint16_t  RET;
-  uint16_t  CKS;
-  uint8_t   payload[0];
-}__attribute__ ((packed)) sRcmDataPacketHeader_t, *pRcmDataPacketHeader_t;
+typedef enum{
+  eLEDMode1 = 1, //呼吸
+  eLEDMode2, //快闪
+  eLEDMode3, //常亮
+  eLEDMode4, //常闭
+  eLEDMode5, //渐开
+  eLEDMode6, //渐关
+  eLEDMode7  //慢闪
+}eLED_MODE_t;
 
-
-  typedef enum{
-    eLEDMode1 = 1, //呼吸
-    eLEDMode2, //快闪
-    eLEDMode3, //常亮
-    eLEDMode4, //常闭
-    eLEDMode5, //渐开
-    eLEDMode6, //渐关
-    eLEDMode7  //慢闪
-  }eLED_MODE_t;
-  
-  typedef enum{
-    LEDGreen = 1, //绿色
-    LEDRed,       //红色
-    LEDYellow,    //黄色
-    LEDBlue,      //蓝色
-    LEDCyan,      //青色
-	LEDMagenta,   //品红色
-	LEDWhite      //白色
-  }eLED_COLOR_t;
-  
-  typedef enum{
-    e9600bps = 1,
-    e19200bps,
-    e38400bps,
-    e57600bps,
-    e115200bps,
-	e230400bps,
-	e460800bps,
-	e921600bps
-  }eDEVICE_BAUDRATE_t;
+typedef enum{
+  LEDGreen = 1, //绿色
+  LEDRed,       //红色
+  LEDYellow,    //黄色
+  LEDBlue,      //蓝色
+  LEDCyan,      //青色
+  LEDMagenta,   //品红色
+  LEDWhite      //白色
+}eLED_COLOR_t;
+ 
+typedef enum{
+  e9600bps = 1,
+  e19200bps,
+  e38400bps,
+  e57600bps,
+  e115200bps,
+  e230400bps,
+  e460800bps,
+  e921600bps
+}eDEVICE_BAUDRATE_t;
   
 
 
@@ -132,8 +102,12 @@ public:
 
 #define CMD_PREFIX_CODE          0xAA55  //命令包前缀代码
 #define RCM_PREFIX_CODE          0x55AA  //响应包前缀代码
-#define CMD_DATA_PREFIX_CODE          0x5AA5  //命令数据包前缀代码
-#define RCM_DATA_PREFIX_CODE          0xA55A  //响应数据包前缀代码
+#define CMD_DATA_PREFIX_CODE          0xA55A  //命令数据包前缀代码
+#define RCM_DATA_PREFIX_CODE          0x5AA5  //响应数据包前缀代码
+
+#define CMDTYPE                   0xF0    //命令包
+#define RCMTYPE                   0xF0    //响应包
+#define DATATYPE                  0x0F    //数据包
 
 #define CMD_TEST_CONNECTION      0X0001  //连接测试
 #define CMD_SET_PARAM            0X0002  //设置参数
@@ -214,37 +188,37 @@ public:
    * @brief 读取模块ID
    * @return ID号:1-255
    */
-  uint8_t readDeviceID();
+  uint8_t getDeviceID();
   
   /**
    * @brief 读取模块安全等级
    * @return 安全等级:1-5
    */
-  uint8_t readSecurityLevel();
+  uint8_t getSecurityLevel();
   
   /**
    * @brief 读取模块指纹重复检查状态
    * @return 1(ON) or 0(OFF)
    */
-  uint8_t readDuplicationCheck();
+  uint8_t getDuplicationCheck();
   
   /**
    * @brief 读取模块波特率
    * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t
    */
-  uint8_t readBaudrate();
+  uint8_t getBaudrate();
   
   /**
    * @brief 读取模块自学功能状态
    * @return 1(ON) or 0(OFF)
    */
-  uint8_t readAutoLearn();
+  uint8_t getAutoLearn();
    
   /**
    * @brief 读取设备号
    * @return 1(succeed) or 0(defeated)
    */
-  uint8_t getDeviceInfo();
+  String getDeviceInfo();
   
   /**
    * @brief 设置LED灯
@@ -328,6 +302,7 @@ public:
    getEnrolledIDList();
   */
   bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
+  void printPacket(pRcmPacketHeader_t packet);
 protected:
   /**
    * @brief 采集指纹图像
@@ -338,34 +313,24 @@ protected:
   //合成指纹
   uint8_t merge();
   
-  pCmdPacketHeader_t cmdPacked(uint16_t cmd, const char *pay_, uint16_t len);
-  pCmdDataPacketHeader_t cmdDataPacked(uint16_t cmd, const char *pay_, uint16_t len);
+  pCmdPacketHeader_t pack(uint8_t type, uint16_t cmd, const char *payload, uint16_t len);
   
   void sendPacket(pCmdPacketHeader_t header);
   size_t readN(void* buf_, size_t len);
   
-  int16_t readPacketPrefix( pRcmPacketHeader_t header );
+  int16_t readPrefix( pRcmPacketHeader_t header );
   uint8_t responsePayload(void* buf);
   
-  int16_t readDataPacketPrefix( pRcmDataPacketHeader_t header );
-  uint8_t responseDataPayload(void* buf);
-  
-  uint16_t getCmdPacketCKS(pCmdPacketHeader_t  packet);
-  uint16_t getRcmPacketCKS(pRcmPacketHeader_t packet);
-  
-  uint16_t getCmdDataPacketCKS(pCmdDataPacketHeader_t  packet);
-  uint16_t getRcmDataPacketCKS(pRcmDataPacketHeader_t packet);
+  uint16_t getCmdCKS(pCmdPacketHeader_t packet);
+  uint16_t getRcmCKS(pRcmPacketHeader_t packet);
+
   
 private:
   Stream *s;
   uint8_t buf[20];
   pCmdPacketHeader_t  sendHeader;
   pRcmPacketHeader_t  recHeader;
-  
-  pCmdDataPacketHeader_t sendDataHeader;
-  pRcmDataPacketHeader_t recDataHeader;
-  uint8_t _sid = 0;  
-  uint8_t _did = 0;
+
   uint8_t _number = 3;            //指纹采集次数，默认三次
   uint8_t _new = 0;       //当前采集次数
 };
