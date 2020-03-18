@@ -145,42 +145,42 @@ public:
   
   /**
    * @brief 测试模块是否正常连接
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t testConnection();
   
   /**
    * @brief 设置模块ID
    * @param ID号:1-255
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t setDeviceID(uint8_t DeviceID);
   
   /**
    * @brief 设置模块安全等级
    * @param 安全等级:1-5
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t setSecurityLevel(uint8_t SecurityLevel);
   
   /**
    * @brief 设置模块指纹重复检查(在保存指纹时，检查是否已被注册)
    * @param 1(ON) or 0(OFF)
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t setDuplicationCheck(uint8_t DuplicationCheck);
   
   /**
    * @brief 设置模块波特率
    * @param Baudrate:in typedef enum eDEVICE_BAUDRATE_t
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t setBaudrate(eDEVICE_BAUDRATE_t Baudrate);
   
   /**
    * @brief 设置模块自学功能(在对比指纹成功时，更新指纹)
    * @param 1(ON) or 0(OFF)
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t setAutoLearn(uint8_t AutoLearn);
   
@@ -216,7 +216,7 @@ public:
    
   /**
    * @brief 读取设备号
-   * @return 1(succeed) or 0(defeated)
+   * @return 设备号
    */
   String getDeviceInfo();
   
@@ -229,13 +229,13 @@ public:
    * @param mode:in typedef enum eLED_MODE_t
    * @param color:in typedef enum eLED_COLOR_t
    * @param 闪烁次数
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t LEDCtrl(eLED_MODE_t mode,eLED_COLOR_t color,uint8_t blinkCount);
   
   /**
    * @brief 检测是否有手指触碰
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t detectFinger();
   
@@ -247,7 +247,7 @@ public:
   
   /**
    * @brief 检查ID是否已被注册
-   * @return 1(已注册) or 0(未注册)
+   * @return 0(已注册) or 1(未注册)
    */
   uint8_t getStatusID(uint8_t ID);
   
@@ -258,28 +258,22 @@ public:
   uint8_t getEnrollCount();
   
   /**
-   * @brief 设置指纹采集次数
-   * @param 采集次数:1-3
-   */
-  void setCollectNumber(uint8_t number);
-  
-  /**
    * @brief 采集指纹
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t fingerprintCollection();
   
   /**
    * @brief 保存指纹
    * @param 指纹ID
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t storeChar(uint8_t ID);
   
   /**
    * @brief 删除指纹
    * @param 指纹ID or DELALL(全部删除)
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t delChar(uint8_t ID);
   
@@ -291,7 +285,7 @@ public:
 
   /**
    * @brief 将指纹与指定指纹匹配
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t verify(uint8_t ID);
 
@@ -299,7 +293,7 @@ public:
    * @brief 指定两个RamBuffer的模板进行对比
    * @param RamBuffer号
    * @param RamBuffer号
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t match(uint8_t RamBufferID0, uint8_t RamBufferID1);
   
@@ -314,13 +308,13 @@ public:
    * @brief 取出指纹模板，暂存到RamBuffer中
    * @param 指纹ID号
    * @param RamBuffer号
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t loadChar(uint8_t ID, uint8_t RamBufferID);
   
   /**
    * @brief 进入休眠状态
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t enterStandbyState();
   
@@ -334,7 +328,7 @@ protected:
    /**
    * @brief 设置参数
    * @param 数据类型+数据
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t setParam(uint8_t* data);
   
@@ -347,14 +341,14 @@ protected:
   
   /**
    * @brief 采集指纹图像
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t getImage();
    
    /**
    * @brief 将图像生成模板
    * @param Ram Buffer 编号
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or 1(defeated)
    */
   uint8_t generate(uint8_t RamBufferID);
   
@@ -379,8 +373,7 @@ private:
   pCmdPacketHeader_t  sendHeader;
   pRcmPacketHeader_t  recHeader;
 
-  uint8_t _number = 3;            //指纹采集次数，默认三次
-  uint8_t _new = 0;       //当前采集次数
+  uint8_t _number = 0;            //指纹采集次数
 };
 
 #endif

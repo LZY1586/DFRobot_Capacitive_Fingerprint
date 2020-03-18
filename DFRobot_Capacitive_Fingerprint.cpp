@@ -141,7 +141,7 @@ uint8_t DFRobot_CapacitiveFingerprint::setModuleSN(uint8_t* SN){
 	free(header);
 	ret = responsePayload(buf);
 	//LDBG("ret=");LDBG(ret);
-	if(ret){
+	if(ret != 0){
 		pCmdPacketHeader_t header = pack(DATATYPE, CMD_SET_MODULE_SN, SN, 16);
 		sendPacket(header);
 		free(header);
@@ -230,18 +230,10 @@ uint8_t DFRobot_CapacitiveFingerprint::getEnrollCount(){
 	return buf[0];
 }
 
-void DFRobot_CapacitiveFingerprint::setCollectNumber(uint8_t number){
-	_number = number;
-	if(number > 3||number <1){
-		_number = 3;
-		//LDBG("设置采集次数不在1-3之间，已自动设置为3次");
-	}
-}
-
 uint8_t DFRobot_CapacitiveFingerprint::storeChar(uint8_t ID){
 	uint8_t data[4] = {0};
 	uint8_t ret = merge();
-	_new = 0;
+	_number = 0;
 	data[0] = ID;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_STORE_CHAR, data, 4);
 	sendPacket(header);
@@ -276,11 +268,11 @@ uint8_t DFRobot_CapacitiveFingerprint::search(){
 	uint8_t data[6] = {0};
 	data[2] = 1;
 	data[4] = 80;
-	_new = 0;
+	_number = 0;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SEARCH, data, 6);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	if(ret){           //如果对比成功返回ID
+	if(ret != 0){           //如果对比成功返回ID
 		ret = buf[0];
 		//LDBG("ret=");LDBG(ret);
 	}
@@ -291,7 +283,7 @@ uint8_t DFRobot_CapacitiveFingerprint::search(){
 uint8_t DFRobot_CapacitiveFingerprint::verify(uint8_t ID){
 	uint8_t data[4] = {0};
 	data[0] = ID;
-	_new = 0;
+	_number = 0;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_VERIFY, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
@@ -390,13 +382,13 @@ uint8_t DFRobot_CapacitiveFingerprint::fingerprintCollection(){  //采集指纹
 	}
 	ret = getImage();
 	//LDBG("ret=");LDBG(ret);
-	if(_new > 2){
+	if(_number > 2){
 		ret = 0;
 		//LDBG("超过采集次数上限");
 	}
-	if(ret){
-		ret = generate(_new);
-		_new++;
+	if(ret != 0){
+		ret = generate(_number);
+		_number++;
 		//LDBG("ret=");LDBG(ret);
 	}
 	return ret;
@@ -482,7 +474,7 @@ uint8_t DFRobot_CapacitiveFingerprint::responsePayload(void* buf){
 		//LDBG("--readPacketPrefix error---");
 		return 0;
 	}
-	ret = !(header.RET>>8);
+	ret = (header.RET>>8);
 	if(header.RET == 1){
 		LDBG("--Module failed to execute---");
 	}
@@ -509,10 +501,10 @@ uint8_t DFRobot_CapacitiveFingerprint::responsePayload(void* buf){
 	cks = packet->payload[dataLen-2]+(packet->payload[dataLen-1]<<8);
     if(dataLen != dataCount){
 		LDBG("--recvRspPacket length error---");
-		ret = 0;
+		ret = 1;
 	}else if(getRcmCKS(packet) != cks){
 		LDBG("--recvRspPacket cs error---");
-		ret = 0;
+		ret = 1;
 	}else{
 		//LDBG("--recvRspPacket OK---");
 		memcpy(buf, packet->payload, dataLen);
@@ -522,9 +514,8 @@ uint8_t DFRobot_CapacitiveFingerprint::responsePayload(void* buf){
 	return ret;
 }
 
-int16_t DFRobot_CapacitiveFingerprint::readPrefix( pRcmPacketHeader_t header ){
-	int16_t ret = 0;
-	uint8_t ch;
+uint8_t DFRobot_CapacitiveFingerprint::readPrefix( pRcmPacketHeader_t header ){
+	uint8_t ch,ret;
 	typedef enum{
 		RECV_HEADER_INIT,
 		RECV_HEADER_AA,
@@ -534,10 +525,9 @@ int16_t DFRobot_CapacitiveFingerprint::readPrefix( pRcmPacketHeader_t header ){
 	eRecvHeaderState state = RECV_HEADER_INIT;
 	while(state != RECV_HEADER_OK){
 		if(readN(&ch, 1) != 1){
-			ret = -1;
+			ret = 1;
 			break;
 		}
-		
 		if((ch == 0xAA) && (state == RECV_HEADER_INIT)){
 			state = RECV_HEADER_AA;
 			continue;
@@ -571,7 +561,7 @@ int16_t DFRobot_CapacitiveFingerprint::readPrefix( pRcmPacketHeader_t header ){
     readN(&header->DID, 1);
     readN(&header->RCM, 2);
     readN(&header->LEN, 2);
-	readN(&header->RET, 2);
+	ret = readN(&header->RET, 2);
 	return ret;
 }
 
