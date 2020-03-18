@@ -34,11 +34,7 @@ uint8_t DFRobot_CapacitiveFingerprint::testConnection(){
 uint8_t DFRobot_CapacitiveFingerprint::setDeviceID(uint8_t deviceID){
 	uint8_t data[5] = {0};
 	data[1] = deviceID;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
+	uint8_t ret = setParam(data);
 	return ret;
 }
 
@@ -46,11 +42,7 @@ uint8_t DFRobot_CapacitiveFingerprint::setSecurityLevel(uint8_t securityLevel){
 	uint8_t data[5] = {0};
 	data[0] = 1;
 	data[1] = securityLevel;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
+	uint8_t ret = setParam(data);
 	return ret;
 }
 
@@ -58,11 +50,7 @@ uint8_t DFRobot_CapacitiveFingerprint::setDuplicationCheck(uint8_t duplicationCh
 	uint8_t data[5] = {0};
 	data[0] = 2;
 	data[1] = duplicationCheck;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
+	uint8_t ret = setParam(data);
 	return ret;
 }
 
@@ -70,11 +58,7 @@ uint8_t DFRobot_CapacitiveFingerprint::setBaudrate(eDEVICE_BAUDRATE_t baudrate){
 	uint8_t data[5] = {0};
 	data[0] = 3;
 	data[1] = baudrate;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
+	uint8_t ret = setParam(data);
 	return ret;
 }
 
@@ -82,76 +66,53 @@ uint8_t DFRobot_CapacitiveFingerprint::setAutoLearn(uint8_t autoLearn){
 	uint8_t data[5] = {0};
 	data[0] = 4;
 	data[1] = autoLearn;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
+	uint8_t ret = setParam(data);
 	return ret;
 }
 
 uint8_t DFRobot_CapacitiveFingerprint::getDeviceID(){
 	uint8_t data[1];
 	data[0] = 0;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
-	return buf[0];
+	uint8_t ret = getParam(data);
+	return ret;
 }
 
 uint8_t DFRobot_CapacitiveFingerprint::getSecurityLevel(){
 	uint8_t data[1];
 	data[0] = 1;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
-	return buf[0];
+	uint8_t ret = getParam(data);
+	return ret;
 }
 
 uint8_t DFRobot_CapacitiveFingerprint::getDuplicationCheck(){
 	uint8_t data[1];
 	data[0] = 2;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
-	return buf[0];
+	uint8_t ret = getParam(data);
+	return ret;
 }
 
 uint8_t DFRobot_CapacitiveFingerprint::getBaudrate(){
 	uint8_t data[1];
 	data[0] = 3;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
-	return buf[0];
+	uint8_t ret = getParam(data);
+	return ret;
 }
 
 uint8_t DFRobot_CapacitiveFingerprint::getAutoLearn(){
 	uint8_t data[1];
 	data[0] = 4;
-	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
-	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
-	free(header);
-	return buf[0];
+	uint8_t ret = getParam(data);
+	return ret;
 }
 
 String DFRobot_CapacitiveFingerprint::getDeviceInfo(){
 	char *data;
+	uint8_t result;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_DEVICE_INFO, NULL, 0);
 	//LDBG("\r\n");//保证发送包是正确的
 	sendPacket(header);
 	free(header);
-	responsePayload(buf);
+	result = responsePayload(buf);
 	//LDBG("result=");LDBG(result);
 	uint16_t dataLen = buf[0]+(buf[1]<<8)+1;
 	if((data = (char *)malloc(dataLen)) == NULL){
@@ -159,18 +120,56 @@ String DFRobot_CapacitiveFingerprint::getDeviceInfo(){
 		while(1);
 	}
 	data[dataLen] = 0;
-	responsePayload(data);
-	//printPacket(header);
-	//printPacket(buf);
-	//printPacket(data);
+	result = responsePayload(data);
 	//LDBG("result=");LDBG(result);//2个包都是正确的
-	/*for(int i;i<dataLen-1;i++){
-		Serial.print(data[i]);
-	}*/
 	String ret=String(data);
-	
 	free(data);
-	Serial.println(ret);
+	return ret;
+}
+
+
+uint8_t DFRobot_CapacitiveFingerprint::setModuleSN(uint8_t* SN){
+	uint8_t data[2];
+	uint8_t ret;
+	data[0] = 16;
+	if(strlen(SN) > 16){
+		LDBG("SN号超过15位");
+		return 0;
+	}
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_MODULE_SN, data, 2);
+	sendPacket(header);
+	free(header);
+	ret = responsePayload(buf);
+	//LDBG("ret=");LDBG(ret);
+	if(ret){
+		pCmdPacketHeader_t header = pack(DATATYPE, CMD_SET_MODULE_SN, SN, 16);
+		sendPacket(header);
+		free(header);
+		ret = responsePayload(buf);
+		//LDBG("ret=");LDBG(ret);
+	}
+	return ret;
+}
+
+String DFRobot_CapacitiveFingerprint::getModuleSN(){
+	char *data;
+	uint8_t result;
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_MODULE_SN, NULL, 0);
+	//LDBG("\r\n");//保证发送包是正确的
+	sendPacket(header);
+	free(header);
+	result = responsePayload(buf);
+	//LDBG("result=");LDBG(result);
+	uint16_t dataLen = buf[0]+(buf[1]<<8)+1;
+	if((data = (char *)malloc(dataLen)) == NULL){
+		LDBG("no memory!!!\r\n");
+		while(1);
+	}
+	data[dataLen] = 0;
+	result = responsePayload(data);
+	//LDBG("result=");LDBG(result);//2个包都是正确的
+	String ret=String(data);
+	free(data);
 	return ret;
 }
 
@@ -239,25 +238,6 @@ void DFRobot_CapacitiveFingerprint::setCollectNumber(uint8_t number){
 	}
 }
 
-uint8_t DFRobot_CapacitiveFingerprint::generate(){
-	uint8_t ret;
-	while(!detectFinger()){
-		delay(20);
-	}
-	ret = getImage();
-	if(ret == 1){
-		uint8_t data[2] = {0};
-		data[0] = _new;
-		_new++;
-		pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GENERATE, data, 2);
-		sendPacket(header);
-		ret = responsePayload(buf);
-		free(header);
-	}
-	//LDBG("ret=");LDBG(ret);
-	return ret;
-}
-
 uint8_t DFRobot_CapacitiveFingerprint::storeChar(uint8_t ID){
 	uint8_t data[4] = {0};
 	uint8_t ret = merge();
@@ -293,31 +273,66 @@ uint8_t DFRobot_CapacitiveFingerprint::delChar(uint8_t ID){
 }
 
 uint8_t DFRobot_CapacitiveFingerprint::search(){
-	uint8_t ret;
 	uint8_t data[6] = {0};
 	data[2] = 1;
 	data[4] = 80;
-	while(!detectFinger()){
-		delay(20);
+	_new = 0;
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SEARCH, data, 6);
+	sendPacket(header);
+	uint8_t ret = responsePayload(buf);
+	if(ret){           //如果对比成功返回ID
+		ret = buf[0];
+		//LDBG("ret=");LDBG(ret);
 	}
-	ret = getImage();
-	if(ret){
-		pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SEARCH, data, 6);
-		sendPacket(header);
-		ret = responsePayload(buf);
-		if(ret){           //如果对比成功返回ID
-			ret = buf[0];
-		}
-	//LDBG("ret=");LDBG(ret);
 	free(header);
-	}
 	return ret;
 }
 
 uint8_t DFRobot_CapacitiveFingerprint::verify(uint8_t ID){
 	uint8_t data[4] = {0};
 	data[0] = ID;
+	_new = 0;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_VERIFY, data, 4);
+	sendPacket(header);
+	uint8_t ret = responsePayload(buf);
+	//LDBG("ret=");LDBG(ret);
+	if(ret)
+	{
+		ret = buf[0];
+	}
+	free(header);
+	return buf[0];
+}
+
+uint8_t DFRobot_CapacitiveFingerprint::match(uint8_t RamBufferID0, uint8_t RamBufferID1){
+	uint8_t data[4] = {0};
+	data[0] = RamBufferID0;
+	data[2] = RamBufferID1;
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_MATCH, data, 4);
+	sendPacket(header);
+	uint8_t ret = responsePayload(buf);
+	//LDBG("ret=");LDBG(ret);
+	free(header);
+	return ret;
+}
+
+uint16_t DFRobot_CapacitiveFingerprint::getBrokenID(){
+	uint8_t data[4] = {0};
+	data[0] = 1;
+	data[2] = 80;
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_BROKEN_ID, data, 4);
+	sendPacket(header);
+	uint8_t ret = responsePayload(buf);
+	//LDBG("ret=");LDBG(ret);
+	free(header);
+	return (buf[0]<<8+buf[2]);
+}
+
+uint8_t DFRobot_CapacitiveFingerprint::loadChar(uint8_t ID, uint8_t RamBufferID){
+	uint8_t data[4] = {0};
+	data[0] = ID;
+	data[2] = RamBufferID;
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_LOAD_CHAR, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
 	//LDBG("ret=");LDBG(ret);
@@ -335,6 +350,23 @@ uint8_t DFRobot_CapacitiveFingerprint::enterStandbyState(){
 }
 /**********************************************************************/
 
+uint8_t DFRobot_CapacitiveFingerprint::setParam(uint8_t* data){
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
+	sendPacket(header);
+	uint8_t ret = responsePayload(buf);
+	//LDBG("ret=");LDBG(ret);
+	free(header);
+	return ret;
+}
+
+uint8_t DFRobot_CapacitiveFingerprint::getParam(uint8_t* data){
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
+	sendPacket(header);
+	uint8_t ret = responsePayload(buf);
+	//LDBG("ret=");LDBG(ret);
+	free(header);
+	return buf[0];
+}
 
 uint8_t DFRobot_CapacitiveFingerprint::getImage(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_IMAGE, NULL, 0);
@@ -342,6 +374,43 @@ uint8_t DFRobot_CapacitiveFingerprint::getImage(){
 	uint8_t ret = responsePayload(buf);
 	//LDBG("ret=");LDBG(ret);
 	free(header);
+	return ret;
+}
+
+uint8_t DFRobot_CapacitiveFingerprint::fingerprintCollection(){  //采集指纹
+	uint8_t ret;
+	uint16_t timeOut = 0;
+	while(!detectFinger()){
+		delay(20);
+		if(++timeOut > 500){
+			ret = 0;
+			//LDBG("采集超时");
+			break;
+		}
+	}
+	ret = getImage();
+	//LDBG("ret=");LDBG(ret);
+	if(_new > 2){
+		ret = 0;
+		//LDBG("超过采集次数上限");
+	}
+	if(ret){
+		ret = generate(_new);
+		_new++;
+		//LDBG("ret=");LDBG(ret);
+	}
+	return ret;
+}
+
+uint8_t DFRobot_CapacitiveFingerprint::generate(uint8_t RamBufferID){
+	uint8_t ret;
+	uint8_t data[2] = {0};
+	data[0] = RamBufferID;
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GENERATE, data, 2);
+	sendPacket(header);
+	ret = responsePayload(buf);
+	free(header);
+	//LDBG("ret=");LDBG(ret);
 	return ret;
 }
 

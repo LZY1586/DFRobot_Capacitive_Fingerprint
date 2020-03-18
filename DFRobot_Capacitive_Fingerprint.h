@@ -105,16 +105,16 @@ public:
 #define CMD_DATA_PREFIX_CODE          0xA55A  //命令数据包前缀代码
 #define RCM_DATA_PREFIX_CODE          0x5AA5  //响应数据包前缀代码
 
-#define CMDTYPE                   0xF0    //命令包
-#define RCMTYPE                   0xF0    //响应包
-#define DATATYPE                  0x0F    //数据包
+#define CMDTYPE                   0xF0    //命令包类型
+#define RCMTYPE                   0xF0    //响应包类型
+#define DATATYPE                  0x0F    //数据包类型
 
 #define CMD_TEST_CONNECTION      0X0001  //连接测试
 #define CMD_SET_PARAM            0X0002  //设置参数
 #define CMD_GET_PARAM            0X0003  //读取参数
-	#define CMD_DEVICE_INFO          0X0004  //读取设备信息
-	#define CMD_SET_MODULE_SN        0X0008  //设置模块序列号-------需求？
-	#define CMD_GET_MODULE_SN        0X0009  //读取模块序列号-------需求？
+#define CMD_DEVICE_INFO          0X0004  //读取设备信息
+#define CMD_SET_MODULE_SN        0X0008  //设置模块序列号
+#define CMD_GET_MODULE_SN        0X0009  //读取模块序列号
 #define CMD_ENTER_STANDBY_STATE  0X000C  //进入休眠状态
 #define CMD_GET_IMAGE            0X0020  //采集指纹图像
 #define CMD_FINGER_DETECT        0X0021  //检测手指
@@ -122,18 +122,18 @@ public:
 	#define CMD_DOWN_IMAGE           0X0023  //下载指纹图像到模块
 #define CMD_SLED_CTRL            0X0024  //控制采集器背光灯
 #define CMD_STORE_CHAR           0X0040  //保存指纹模板数据到模块指纹库
-	#define CMD_LOAD_CHAR            0X0041  //读取模块中的指纹并暂存在 RAMBUFFER 中
+#define CMD_LOAD_CHAR            0X0041  //读取模块中的指纹并暂存在 RAMBUFFER 中
 	#define CMD_UP_CHAR              0X0042  //将暂存在 RAMBUFFER 中的指纹模板上传到主机
 	#define CMD_DOWN_CHAR            0X0043  //下载指纹模板数据到模块指定的 RAMBUFFER
 #define CMD_DEL_CHAR             0X0044  //删除指定编号范围内的指纹
 #define CMD_GET_EMPTY_ID         0X0045  //获取指定编号范围内可注册的首个编号
 #define CMD_GET_STATUS           0X0046  //检查指定的编号是否已被注册
-	#define CMD_GET_BROKEN_ID        0X0047  //检查指定范围内的指纹库是否有数据损坏
+#define CMD_GET_BROKEN_ID        0X0047  //检查指定范围内的指纹库是否有数据损坏
 #define CMD_GET_ENROLL_COUNT     0X0048  //获取指定编号范围内已注册的指纹总数
 	#define CMD_GET_ENROLLED_ID_LIST 0X0049  //获取已注册 ID 列表
 #define CMD_GENERATE             0X0060  //从暂存在 IMAGEBUFFER 中的指纹图像产生模板
 #define CMD_MERGE                0X0061  //合成指纹模板数据用于入库
-	#define CMD_MATCH                0X0062  //指定2个RAMBUFFER 之间的模板做比对
+#define CMD_MATCH                0X0062  //指定2个RAMBUFFER 之间的模板做比对
 #define CMD_SEARCH               0X0063  //指定编号范围的1:N识别
 #define CMD_VERIFY               0X0064  //指定 RAMBUFFER 与指纹库中指定编号的模板比对
 
@@ -220,6 +220,10 @@ public:
    */
   String getDeviceInfo();
   
+  //设置序列号
+  uint8_t setModuleSN(uint8_t* SN);
+  //读取序列号
+  String getModuleSN();
   /**
    * @brief 设置LED灯
    * @param mode:in typedef enum eLED_MODE_t
@@ -257,13 +261,13 @@ public:
    * @brief 设置指纹采集次数
    * @param 采集次数:1-3
    */
-   void setCollectNumber(uint8_t number);
+  void setCollectNumber(uint8_t number);
   
   /**
-   * @brief 获取指纹
+   * @brief 采集指纹
    * @return 1(succeed) or 0(defeated)
    */
-  uint8_t generate();
+  uint8_t fingerprintCollection();
   
   /**
    * @brief 保存指纹
@@ -290,6 +294,29 @@ public:
    * @return 1(succeed) or 0(defeated)
    */
   uint8_t verify(uint8_t ID);
+
+  /**
+   * @brief 指定两个RamBuffer的模板进行对比
+   * @param RamBuffer号
+   * @param RamBuffer号
+   * @return 1(succeed) or 0(defeated)
+   */
+  uint8_t match(uint8_t RamBufferID0, uint8_t RamBufferID1);
+  
+  /**
+   * @brief 检测指纹是否有损坏
+   * @return 高八位:数量  第八位:ID
+   */
+  ///////////////////////有问题/////////////////////////////////////////
+  uint16_t getBrokenID();
+  
+  /**
+   * @brief 取出指纹模板，暂存到RamBuffer中
+   * @param 指纹ID号
+   * @param RamBuffer号
+   * @return 1(succeed) or 0(defeated)
+   */
+  uint8_t loadChar(uint8_t ID, uint8_t RamBufferID);
   
   /**
    * @brief 进入休眠状态
@@ -304,11 +331,32 @@ public:
   bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
   void printPacket(pRcmPacketHeader_t packet);
 protected:
+   /**
+   * @brief 设置参数
+   * @param 数据类型+数据
+   * @return 1(succeed) or 0(defeated)
+   */
+  uint8_t setParam(uint8_t* data);
+  
+   /**
+   * @brief 读取参数
+   * @param 数据类型
+   * @return 数据
+   */
+  uint8_t getParam(uint8_t* data);
+  
   /**
    * @brief 采集指纹图像
    * @return 1(succeed) or 0(defeated)
    */
   uint8_t getImage();
+   
+   /**
+   * @brief 将图像生成模板
+   * @param Ram Buffer 编号
+   * @return 1(succeed) or 0(defeated)
+   */
+  uint8_t generate(uint8_t RamBufferID);
   
   //合成指纹
   uint8_t merge();
