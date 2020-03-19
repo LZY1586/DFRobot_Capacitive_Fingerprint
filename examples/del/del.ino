@@ -12,18 +12,24 @@
 */
 include <DFRobot_ID809.h>
 
-#define DELID 5
+#define FINGERPRINTID 1
 
 DFRobot_ID809 sensor;
 
 void setup(){
+  /*初始化打印串口*/
   Serial.begin(9600);
+  /*初始化Serial1*/
   Serial1.begin(115200);
+  /*将Serial1作为指纹模块的通讯串口*/
   sensor.begin(Serial1);
+  /*等待Serial打开*/
   while(!Serial);
-  if(sensor.getStatusID(DELID)){
+  //检查指纹编号是否被注册
+  if(sensor.getStatusID(FINGERPRINTID)){
 	Serial.println("ID已注册");
-	sensor.delChar(DELID);
+	//删除该编号的指纹
+	sensor.delChar(FINGERPRINTID);
 	//sensor.delChar(DELALL);  //删除所有指纹
 	Serial.println("ID已删除");
   }else{
@@ -32,7 +38,8 @@ void setup(){
 }
 
 void loop(){
-  if(sensor.getStatusID(DELID)){
+  //检查指纹编号是否被注册
+  if(sensor.getStatusID(FINGERPRINTID)){
 	Serial.println("ID已注册");
   }else{
 	  Serial.println("ID未注册");

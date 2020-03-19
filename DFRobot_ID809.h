@@ -27,7 +27,7 @@
 #include <SoftwareSerial.h>
 
 //Open this macro to see the detailed running process of the program 
-#define ENABLE_DBG
+#define ENABLE_DBG 0
 #ifdef ENABLE_DBG
 #define LDBG(...) if(dbg) {dbg->print("["); dbg->print(__FUNCTION__); dbg->print("(): "); dbg->print(__LINE__); dbg->print(" ] "); dbg->println(__VA_ARGS__);}
 #else

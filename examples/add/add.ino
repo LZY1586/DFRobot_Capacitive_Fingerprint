@@ -2,9 +2,10 @@
  * @file add.ino
  * @brief 采集指纹并保存
  * @n 本实验需要Leonardo主控和ID809指纹模块
- * @n 实验现象：自动获取空白ID，然后采集三次指纹，
- * @n 采集时蓝色灯快闪，采集成功黄色灯快闪3次，
- * @n 最后保存到获取到的空白ID中，绿色灯亮1S然后熄灭
+ * @n 实验现象：自动获取空白ID，然后采集三次指纹，采集时
+ * @n           蓝色灯快闪，采集成功黄色灯快闪3次，最后将
+ * @n           指纹保存到获取到的未注册的编号中，绿色灯
+ * @n           亮1S然后熄灭
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)
  * @author [Eddard](Eddard.liu@dfrobot.com)
@@ -31,10 +32,10 @@ void setup(){
   while(!Serial);
 }
 
-uint8_t ID,i;
+uint8_t ID,i,ret;
 
 void loop(){
-  /*获取一个空白ID*/
+  /*获取一个未注册编号，用来保存指纹*/
   ID = sensor.getEmptyID();
   Serial.print("ID=");
   Serial.println(ID);
@@ -44,7 +45,8 @@ void loop(){
     sensor.LEDCtrl(eLEDMode2, LEDBlue, 0);
     Serial.println("请按下手指");
     /*采集指纹图像，超过10S没按下手指则采集超时*/
-    if(sensor.fingerprintCollection(10) != 0){
+    if((ret = sensor.fingerprintCollection(10)) != 0){
+      //打印ret对应的错误码
       Serial.println("采集失败");
       i--;
     }else{

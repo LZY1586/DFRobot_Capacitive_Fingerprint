@@ -38,7 +38,7 @@ uint8_t DFRobot_ID809::testConnection(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_TEST_CONNECTION, NULL, 0);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -152,13 +152,13 @@ uint8_t DFRobot_ID809::setModuleSN(uint8_t* SN){
 	sendPacket(header);
 	free(header);
 	ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(ret != 0){
 		pCmdPacketHeader_t header = pack(DATATYPE, CMD_SET_MODULE_SN, SN, 16);
 		sendPacket(header);
 		free(header);
 		ret = responsePayload(buf);
-		//LDBG("ret=");LDBG(ret);
+		LDBG("ret=");LDBG(ret);
 	}
 	return ret;
 }
@@ -193,7 +193,7 @@ uint8_t DFRobot_ID809::LEDCtrl(eLED_MODE_t mode,eLED_COLOR_t color,uint8_t blink
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SLED_CTRL, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -202,7 +202,7 @@ uint8_t DFRobot_ID809::detectFinger(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_FINGER_DETECT, NULL, 0);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(ret == 0){
 		ret = buf[0];
 	}
@@ -231,7 +231,7 @@ uint8_t DFRobot_ID809::getStatusID(uint8_t ID){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_STATUS, data, 2);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(ret == 0){
 		ret = buf[0];
 	}
@@ -246,7 +246,7 @@ uint8_t DFRobot_ID809::getEnrollCount(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_ENROLL_COUNT, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(ret == 0){
 		ret = buf[0];
 	}
@@ -263,10 +263,10 @@ uint8_t DFRobot_ID809::storeChar(uint8_t ID){
 	sendPacket(header);
 	ret = responsePayload(buf);
 	if(ret == 0x18){
-		//LDBG("该指纹已注册");
+		LDBG("该指纹已注册");
 		ret = buf[0];
 	}
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 	
@@ -283,7 +283,7 @@ uint8_t DFRobot_ID809::delChar(uint8_t ID){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_DEL_CHAR, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -298,7 +298,7 @@ uint8_t DFRobot_ID809::search(){
 	uint8_t ret = responsePayload(buf);
 	if(ret == 0){
 		ret = buf[0];
-		//LDBG("ret=");LDBG(ret);
+		LDBG("ret=");LDBG(ret);
 	}
 	free(header);
 	return ret;
@@ -311,7 +311,7 @@ uint8_t DFRobot_ID809::verify(uint8_t ID){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_VERIFY, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(ret == 0)
 	{
 		ret = buf[0];
@@ -327,7 +327,7 @@ uint8_t DFRobot_ID809::match(uint8_t RamBufferID0, uint8_t RamBufferID1){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_MATCH, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -339,7 +339,7 @@ uint16_t DFRobot_ID809::getBrokenID(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_BROKEN_ID, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return (buf[0]<<8+buf[2]);
 }
@@ -351,7 +351,7 @@ uint8_t DFRobot_ID809::loadChar(uint8_t ID, uint8_t RamBufferID){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_LOAD_CHAR, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -360,7 +360,7 @@ uint8_t DFRobot_ID809::enterStandbyState(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_ENTER_STANDBY_STATE, NULL, 0);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -370,7 +370,7 @@ uint8_t DFRobot_ID809::setParam(uint8_t* data){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -379,7 +379,7 @@ uint8_t DFRobot_ID809::getParam(uint8_t* data){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(ret == 0){
 		ret = buf[0];
 	}
@@ -391,7 +391,7 @@ uint8_t DFRobot_ID809::getImage(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_IMAGE, NULL, 0);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -403,21 +403,21 @@ uint8_t DFRobot_ID809::fingerprintCollection(uint16_t time){  //采集指纹
 		delay(10);
 		if(++timeOut > time*100){
 			ret = ERR_TIME_OUT;
-			//LDBG("采集超时");
-			//LDBG("ret=");LDBG(ret);
+			LDBG("采集超时");
+			LDBG("ret=");LDBG(ret);
 			return ret;
 		}
 	}
 	ret = getImage();
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(_number > 2){
 		ret = ERR_GATHER_OUT;
-		//LDBG("超过采集次数上限");
+		LDBG("超过采集次数上限");
 	}
 	if(ret == 0){
 		ret = generate(_number);
 		_number++;
-		//LDBG("ret=");LDBG(ret);
+		LDBG("ret=");LDBG(ret);
 	}
 	return ret;
 }
@@ -430,7 +430,7 @@ uint8_t DFRobot_ID809::generate(uint8_t RamBufferID){
 	sendPacket(header);
 	ret = responsePayload(buf);
 	free(header);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	return ret;
 }
 
@@ -440,7 +440,7 @@ uint8_t DFRobot_ID809::merge(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_MERGE, data, 3);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -482,13 +482,6 @@ pCmdPacketHeader_t DFRobot_ID809::pack(uint8_t type, uint16_t cmd, const char *p
 
 
 void DFRobot_ID809::sendPacket(pCmdPacketHeader_t header){
-	//LDBG("SID=");LDBG(header->SID, HEX);
-	//LDBG("DID=");LDBG(header->DID, HEX);
-	//LDBG("CMD=");LDBG(header->CMD, HEX);
-	//LDBG("LEN=");LDBG(header->LEN, HEX);
-	//LDBG("DATA=");LDBG(header->payload[0], HEX);
-	//LDBG("CKS=");LDBG(header->CKS, HEX);
-	//LDBG("Size=");LDBG(_PacketSize);
 	s->write((uint8_t *)header,_PacketSize);
 }
 
@@ -499,7 +492,7 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
 	int16_t type;
 	type = readPrefix(&header);
 	if(type < 0){
-		//LDBG("--readPacketPrefix error---");
+		LDBG("--readPacketPrefix error---");
 		return 0;
 	}
 	pRcmPacketHeader_t packet;
@@ -520,7 +513,6 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
 	}
 	memcpy(packet, &header, 10);
     dataCount = readN(packet->payload, dataLen);
-	//LDBG("Rcs=");LDBG(packet->CKS);
 	cks = packet->payload[dataLen-2]+(packet->payload[dataLen-1]<<8);
 	ret = (header.RET>>8);
 	if(ret != 0){
@@ -570,7 +562,6 @@ uint16_t DFRobot_ID809::readPrefix( pRcmPacketHeader_t header ){
 			ret = DATATYPE;
 			continue;
 		}else{
-			//LDBG(ch,HEX);
 			state = RECV_HEADER_INIT;
 			if(ch == 0xAA){
 				state = RECV_HEADER_AA;
@@ -599,7 +590,6 @@ size_t DFRobot_ID809::readN(void* buffer, size_t len){
 	while(left){
 		if(s->available()){
 			buf[offset++] = s->read();
-		//	LDBG(buf[offset-1], HEX);
 		    left--;
 		}
 		if(millis() - curr > 5000){
