@@ -1,3 +1,15 @@
+/*!
+ * @file DFRobot_ID809.cpp
+ * @brief 定义DFRobot_ID809类的基础结构和底层方法的实现
+ * @copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
+ * @licence     The MIT License (MIT)
+ * @author [Eddard](eddard.liu@dfrobot.com)
+ * @version  V1.0
+ * @date  2020-03-19
+ * @get from https://www.dfrobot.com
+ * @url https://github.com/DFRobot/DFRobot_IIC_Serial
+ */
+
 #include <DFRobot_ID809.h>
 #include <Arduino.h>
 #include <string.h>
@@ -252,7 +264,7 @@ uint8_t DFRobot_ID809::storeChar(uint8_t ID){
 	ret = responsePayload(buf);
 	if(ret == 0x18){
 		//LDBG("该指纹已注册");
-		return buf[0];
+		ret = buf[0];
 	}
 	//LDBG("ret=");LDBG(ret);
 	free(header);
@@ -514,7 +526,6 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
 	if(ret != 0){
 		LDBG("--ERR CODE---");
 	}
-	Serial.println(cks,HEX);
     if(dataLen != dataCount){
 		LDBG("--recvRspPacket length error---");
 		ret = ERR_RECV_LENGTH;

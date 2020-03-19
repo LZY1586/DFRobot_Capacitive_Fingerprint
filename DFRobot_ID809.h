@@ -1,16 +1,15 @@
 /*!
  * @file DFRobot_ID809.h
  * @brief 定义 DFRobot_ID809 类的基础结构
- * @n 这是一个电容指纹识别模块的库；
- * @n 其主要功能是采集手指图像、对比指纹、
- * @n 删除指纹等
- *
+ * @n 这是一个电容指纹识别模块的库,其主要
+ * @n 功能是采集手指图像、对比指纹、删除指纹等
  * @copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)
  * @author [Eddard](eddard.liu@dfrobot.com)
  * @version  V1.0
- * @date  2019-07-28
- * @https://github.com/DFRobot/DFRobot_IIC_Serial
+ * @date  2020-03-19
+ * @get from https://www.dfrobot.com
+ * @url https://github.com/DFRobot/DFRobot_IIC_Serial
  */
 
 #ifndef _DFRobot_ID809_H
@@ -178,65 +177,65 @@ public:
   /**
    * @brief 设置模块ID
    * @param ID号:1-255
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t setDeviceID(uint8_t DeviceID);
   
   /**
    * @brief 设置模块安全等级
    * @param 安全等级:1-5
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t setSecurityLevel(uint8_t SecurityLevel);
   
   /**
    * @brief 设置模块指纹重复检查(在保存指纹时，检查是否已被注册)
    * @param 1(ON) or 0(OFF)
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t setDuplicationCheck(uint8_t DuplicationCheck);
   
   /**
    * @brief 设置模块波特率
    * @param Baudrate:in typedef enum eDEVICE_BAUDRATE_t
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t setBaudrate(eDEVICE_BAUDRATE_t Baudrate);
   
   /**
    * @brief 设置模块自学功能(在对比指纹成功时，更新指纹)
    * @param 1(ON) or 0(OFF)
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t setAutoLearn(uint8_t AutoLearn);
   
   /**
    * @brief 读取模块ID
-   * @return ID号:1-255
+   * @return ID号:1-255 or Error Code
    */
   uint8_t getDeviceID();
   
   /**
    * @brief 读取模块安全等级
-   * @return 安全等级:1-5
+   * @return 安全等级:1-5 or Error Code
    */
   uint8_t getSecurityLevel();
   
   /**
    * @brief 读取模块指纹重复检查状态
-   * @return 1(ON) or 0(OFF)
+   * @return 状态：1(ON) or 0(OFF)
    */
   uint8_t getDuplicationCheck();
   
   /**
    * @brief 读取模块波特率
-   * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t
+   * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t or Error Code
    */
   uint8_t getBaudrate();
   
   /**
    * @brief 读取模块自学功能状态
-   * @return 1(ON) or 0(OFF)
+   * @return 状态：1(ON) or 0(OFF)
    */
   uint8_t getAutoLearn();
    
@@ -246,28 +245,36 @@ public:
    */
   String getDeviceInfo();
   
-  //设置序列号
+  /**
+   * @brief 设置序列号
+   * @param 字符串指针
+   * @return 0(succeed) or Error Code
+   */
   uint8_t setModuleSN(uint8_t* SN);
-  //读取序列号
+  /**
+   * @brief 读取序列号
+   * @return 序列号
+   */
   String getModuleSN();
+  
   /**
    * @brief 设置LED灯
    * @param mode:in typedef enum eLED_MODE_t
    * @param color:in typedef enum eLED_COLOR_t
    * @param 闪烁次数
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t LEDCtrl(eLED_MODE_t mode,eLED_COLOR_t color,uint8_t blinkCount);
   
   /**
    * @brief 检测是否有手指触碰
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t detectFinger();
   
   /**
    * @brief 获取可注册首个编号
-   * @return 可注册ID号
+   * @return 可注册ID号 or Error Code
    */
   uint8_t getEmptyID();
   
@@ -279,39 +286,39 @@ public:
   
   /**
    * @brief 获取注册用户数量
-   * @return 注册用户数量
+   * @return 注册用户数量 or Error Code
    */
   uint8_t getEnrollCount();
   
   /**
    * @brief 采集指纹
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t fingerprintCollection(uint16_t time);
   
   /**
    * @brief 保存指纹
    * @param 指纹ID
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t storeChar(uint8_t ID);
   
   /**
    * @brief 删除指纹
    * @param 指纹ID or DELALL(全部删除)
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t delChar(uint8_t ID);
   
   /**
    * @brief 将指纹与全部指纹匹配
-   * @return 匹配成功的指纹ID or 0(defeated)
+   * @return 匹配成功的指纹ID or 0(匹配失败)
    */
   uint8_t search();
 
   /**
    * @brief 将指纹与指定指纹匹配
-   * @return 0(succeed) or 1(defeated)
+   * @return 匹配成功的指纹ID or 0(匹配失败)
    */
   uint8_t verify(uint8_t ID);
 
@@ -319,7 +326,7 @@ public:
    * @brief 指定两个RamBuffer的模板进行对比
    * @param RamBuffer号
    * @param RamBuffer号
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t match(uint8_t RamBufferID0, uint8_t RamBufferID1);
   
@@ -327,20 +334,20 @@ public:
    * @brief 检测指纹是否有损坏
    * @return 高八位:数量  第八位:ID
    */
-  ///////////////////////有问题/////////////////////////////////////////
+  //返回值问题，该返回什么？
   uint16_t getBrokenID();
   
   /**
    * @brief 取出指纹模板，暂存到RamBuffer中
    * @param 指纹ID号
    * @param RamBuffer号
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t loadChar(uint8_t ID, uint8_t RamBufferID);
   
   /**
    * @brief 进入休眠状态
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t enterStandbyState();
   
@@ -353,31 +360,34 @@ protected:
    /**
    * @brief 设置参数
    * @param 数据类型+数据
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t setParam(uint8_t* data);
   
    /**
    * @brief 读取参数
    * @param 数据类型
-   * @return 数据
+   * @return 数据 or Error Code
    */
   uint8_t getParam(uint8_t* data);
   
   /**
    * @brief 采集指纹图像
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t getImage();
    
    /**
    * @brief 将图像生成模板
    * @param Ram Buffer 编号
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t generate(uint8_t RamBufferID);
   
-  //合成指纹
+ /**
+   * @brief 合成指纹
+   * @return 0(succeed) or Error Code
+   */
   uint8_t merge();
   
   pCmdPacketHeader_t pack(uint8_t type, uint16_t cmd, const char *payload, uint16_t len);
