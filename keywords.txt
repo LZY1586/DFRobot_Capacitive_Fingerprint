@@ -1,12 +1,12 @@
 #######################################
-# Syntax DFRobot_Capacitive_Fingerprint
+# Syntax DFRobot_ID809
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-DFRobot_CapacitiveFingerprint	KEYWORD1
+DFRobot_ID809	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

@@ -1,6 +1,6 @@
 /*!
- * @file DFROBOT_Capacitive_Fingerprint.h
- * @brief 定义 DFROBOT_Capacitive_Fingerprint 类的基础结构
+ * @file DFRobot_ID809.h
+ * @brief 定义 DFRobot_ID809 类的基础结构
  * @n 这是一个电容指纹识别模块的库；
  * @n 其主要功能是采集手指图像、对比指纹、
  * @n 删除指纹等
@@ -13,8 +13,8 @@
  * @https://github.com/DFRobot/DFRobot_IIC_Serial
  */
 
-#ifndef _DFROBOT_CAPACITIVE_FINGERPRINT_H
-#define _DFROBOT_CAPACITIVE_FINGERPRINT_H
+#ifndef _DFRobot_ID809_H
+#define _DFRobot_ID809_H
 
 #if ARDUINO >= 100
 #include "Arduino.h"
@@ -95,7 +95,7 @@ typedef enum{
   
 
 
-class DFRobot_CapacitiveFingerprint{
+class DFRobot_ID809{
 public: 
 
 #define DELALL                   0xFF    //删除所有指纹
@@ -138,9 +138,35 @@ public:
 #define CMD_VERIFY               0X0064  //指定 RAMBUFFER 与指纹库中指定编号的模板比对
 
 
+#define ERR_SUCCESS              0x00    //指令处理成功
+#define ERR_FAIL                 0x01    //指令处理失败
+#define ERR_VERIFY               0x10    //与指定编号中 Template 的 1:1 比对失败
+#define ERR_IDENTIFY             0x11    //已进行 1:N 比对， 但相同 Template 不存在
+#define ERR_TMPL_EMPTY           0x12    //在指定编号中不存在已注册的 Template 
+#define ERR_TMPL_NOT_EMPTY       0x13    //在指定编号中已存在 Template 
+#define ERR_ALL_TMPL_EMPTY       0x14    //不存在已注册的 Template 
+#define ERR_EMPTY_ID_NOEXIST     0x15    //不存在可注册的 Template ID 
+#define ERR_BROKEN_ID_NOEXIST    0x16    //不存在已损坏的 Template 
+#define ERR_INVALID_TMPL_DATA    0x17    //指定的 Template Data 无效
+#define ERR_DUPLICATION_ID       0x18    //该指纹已注册
+#define ERR_BAD_QUALITY          0x19    //指纹图像质量不好
+#define ERR_MERGE_FAIL           0x1A    //Template 合成失败
+#define ERR_NOT_AUTHORIZED       0x1B    //没有进行通讯密码确认
+#define ERR_MEMORY               0x1C    //外部 Flash 烧写出错
+#define ERR_INVALID_TMPL_NO      0x1D    //指定 Template 编号无效
+#define ERR_INVALID_PARAM        0x22    //使用了不正确的参数
+#define ERR_GEN_COUNT            0x25    //指纹合成个数无效
+#define ERR_INVALID_BUFFER_ID    0x26    //Buffer ID 值不正确
+#define ERR_FP_NOT_DETECTED      0x28    //采集器上没有指纹输入
+#define ERR_FP_CANCEL            0x41    //指令被取消
+#define ERR_RECV_LENGTH          0x42    //接收数据长度错误
+#define ERR_RECV_CKS             0x43    //校验码错误
+#define ERR_TIME_OUT             0x44    //采集超时
+#define ERR_GATHER_OUT           0x45    //模板采集次数超过上限
+
 public:
-  DFRobot_CapacitiveFingerprint();
-  ~DFRobot_CapacitiveFingerprint();
+  DFRobot_ID809();
+  ~DFRobot_ID809();
   bool begin(Stream &s_);
   
   /**
@@ -261,7 +287,7 @@ public:
    * @brief 采集指纹
    * @return 0(succeed) or 1(defeated)
    */
-  uint8_t fingerprintCollection();
+  uint8_t fingerprintCollection(uint16_t time);
   
   /**
    * @brief 保存指纹
@@ -323,7 +349,6 @@ public:
    getEnrolledIDList();
   */
   bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
-  void printPacket(pRcmPacketHeader_t packet);
 protected:
    /**
    * @brief 设置参数
@@ -360,7 +385,7 @@ protected:
   void sendPacket(pCmdPacketHeader_t header);
   size_t readN(void* buf_, size_t len);
   
-  int16_t readPrefix( pRcmPacketHeader_t header );
+  uint16_t readPrefix( pRcmPacketHeader_t header );
   uint8_t responsePayload(void* buf);
   
   uint16_t getCmdCKS(pCmdPacketHeader_t packet);
