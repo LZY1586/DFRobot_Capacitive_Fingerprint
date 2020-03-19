@@ -205,7 +205,7 @@ uint8_t DFRobot_ID809::getEmptyID(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_EMPTY_ID, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	//LDBG("ret=");LDBG(ret);
+	LDBG("ret=");LDBG(ret);
 	if(ret == 0){
 		ret = buf[0];
 	}
@@ -490,10 +490,6 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
 		//LDBG("--readPacketPrefix error---");
 		return 0;
 	}
-	ret = (header.RET>>8)&0xFF; //？？？
-	if(ret != 0){
-		return ret;
-	}
 	pRcmPacketHeader_t packet;
 	if(type == RCMTYPE){
 		packet = (pRcmPacketHeader_t)malloc(sizeof(sRcmPacketHeader_t)+14+2);
@@ -514,6 +510,11 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
     dataCount = readN(packet->payload, dataLen);
 	//LDBG("Rcs=");LDBG(packet->CKS);
 	cks = packet->payload[dataLen-2]+(packet->payload[dataLen-1]<<8);
+	ret = (header.RET>>8);
+	if(ret != 0){
+		LDBG("--ERR CODE---");
+	}
+	Serial.println(cks,HEX);
     if(dataLen != dataCount){
 		LDBG("--recvRspPacket length error---");
 		ret = ERR_RECV_LENGTH;
@@ -576,8 +577,8 @@ uint16_t DFRobot_ID809::readPrefix( pRcmPacketHeader_t header ){
     readN(&header->DID, 1);
     readN(&header->RCM, 2);
     readN(&header->LEN, 2);
-	ret = readN(&header->RET, 2);
-	return ;
+	readN(&header->RET, 2);
+	return ret;
 }
 
 size_t DFRobot_ID809::readN(void* buffer, size_t len){
