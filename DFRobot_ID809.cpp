@@ -254,7 +254,7 @@ uint8_t DFRobot_ID809::getEnrollCount(){
 	return ret;
 }
 
-uint8_t DFRobot_ID809::storeChar(uint8_t ID){
+uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID){
 	uint8_t data[4] = {0};
 	uint8_t ret = merge();
 	_number = 0;
@@ -272,7 +272,7 @@ uint8_t DFRobot_ID809::storeChar(uint8_t ID){
 	
 }
 
-uint8_t DFRobot_ID809::delChar(uint8_t ID){
+uint8_t DFRobot_ID809::delFingerprint(uint8_t ID){
 	uint8_t data[4] = {0};
 	if(ID == DELALL){
 		data[0] = 1;
@@ -296,9 +296,9 @@ uint8_t DFRobot_ID809::search(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SEARCH, data, 6);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
+	LDBG("ret=");LDBG(ret);
 	if(ret == 0){
 		ret = buf[0];
-		LDBG("ret=");LDBG(ret);
 	}
 	free(header);
 	return ret;
@@ -328,11 +328,15 @@ uint8_t DFRobot_ID809::match(uint8_t RamBufferID0, uint8_t RamBufferID1){
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
+	if(ret == 0)
+	{
+		ret = buf[0];
+	}
 	free(header);
 	return ret;
 }
 
-uint16_t DFRobot_ID809::getBrokenID(){
+uint8_t DFRobot_ID809::getBrokenQuantity(){
 	uint8_t data[4] = {0};
 	data[0] = 1;
 	data[2] = 80;
@@ -340,8 +344,28 @@ uint16_t DFRobot_ID809::getBrokenID(){
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
+	if(ret == 0)
+	{
+		ret = buf[0];
+	}
 	free(header);
-	return (buf[0]<<8+buf[2]);
+	return ret;
+}
+
+uint8_t DFRobot_ID809::getBrokenID(){
+	uint8_t data[4] = {0};
+	data[0] = 1;
+	data[2] = 80;
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_BROKEN_ID, data, 4);
+	sendPacket(header);
+	uint8_t ret = responsePayload(buf);
+	LDBG("ret=");LDBG(ret);
+	if(ret == 0)
+	{
+		ret = buf[0];
+	}
+	free(header);
+	return ret;
 }
 
 uint8_t DFRobot_ID809::loadChar(uint8_t ID, uint8_t RamBufferID){
@@ -396,12 +420,12 @@ uint8_t DFRobot_ID809::getImage(){
 	return ret;
 }
 
-uint8_t DFRobot_ID809::fingerprintCollection(uint16_t time){  //采集指纹
+uint8_t DFRobot_ID809::fingerprintCollection(uint16_t timeout){  //采集指纹
 	uint8_t ret;
-	uint16_t timeOut = 0;
+	uint16_t i = 0;
 	while(!detectFinger()){
 		delay(10);
-		if(++timeOut > time*100){
+		if(++i > timeout*100){
 			ret = ERR_TIME_OUT;
 			LDBG("采集超时");
 			LDBG("ret=");LDBG(ret);

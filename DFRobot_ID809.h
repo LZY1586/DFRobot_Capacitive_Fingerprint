@@ -35,6 +35,7 @@
 #endif
 
 extern Stream *dbg;
+
   /*
    命令包的帧结构
   */
@@ -60,37 +61,6 @@ typedef struct{
   uint8_t   payload[0];
 }__attribute__ ((packed)) sRcmPacketHeader_t, *pRcmPacketHeader_t;
 
-
-typedef enum{
-  eLEDMode1 = 1, //呼吸
-  eLEDMode2, //快闪
-  eLEDMode3, //常亮
-  eLEDMode4, //常闭
-  eLEDMode5, //渐开
-  eLEDMode6, //渐关
-  eLEDMode7  //慢闪
-}eLED_MODE_t;
-
-typedef enum{
-  LEDGreen = 1, //绿色
-  LEDRed,       //红色
-  LEDYellow,    //黄色
-  LEDBlue,      //蓝色
-  LEDCyan,      //青色
-  LEDMagenta,   //品红色
-  LEDWhite      //白色
-}eLED_COLOR_t;
- 
-typedef enum{
-  e9600bps = 1,
-  e19200bps,
-  e38400bps,
-  e57600bps,
-  e115200bps,
-  e230400bps,
-  e460800bps,
-  e921600bps
-}eDEVICE_BAUDRATE_t;
   
 
 
@@ -101,8 +71,8 @@ public:
 
 #define CMD_PREFIX_CODE          0xAA55  //命令包前缀代码
 #define RCM_PREFIX_CODE          0x55AA  //响应包前缀代码
-#define CMD_DATA_PREFIX_CODE          0xA55A  //命令数据包前缀代码
-#define RCM_DATA_PREFIX_CODE          0x5AA5  //响应数据包前缀代码
+#define CMD_DATA_PREFIX_CODE     0xA55A  //命令数据包前缀代码
+#define RCM_DATA_PREFIX_CODE     0x5AA5  //响应数据包前缀代码
 
 #define CMDTYPE                   0xF0    //命令包类型
 #define RCMTYPE                   0xF0    //响应包类型
@@ -136,34 +106,68 @@ public:
 #define CMD_SEARCH               0X0063  //指定编号范围的1:N识别
 #define CMD_VERIFY               0X0064  //指定 RAMBUFFER 与指纹库中指定编号的模板比对
 
-
-#define ERR_SUCCESS              0x00    //指令处理成功
-#define ERR_FAIL                 0x01    //指令处理失败
-#define ERR_VERIFY               0x10    //与指定编号中 Template 的 1:1 比对失败
-#define ERR_IDENTIFY             0x11    //已进行 1:N 比对， 但相同 Template 不存在
-#define ERR_TMPL_EMPTY           0x12    //在指定编号中不存在已注册的 Template 
-#define ERR_TMPL_NOT_EMPTY       0x13    //在指定编号中已存在 Template 
-#define ERR_ALL_TMPL_EMPTY       0x14    //不存在已注册的 Template 
-#define ERR_EMPTY_ID_NOEXIST     0x15    //不存在可注册的 Template ID 
-#define ERR_BROKEN_ID_NOEXIST    0x16    //不存在已损坏的 Template 
-#define ERR_INVALID_TMPL_DATA    0x17    //指定的 Template Data 无效
-#define ERR_DUPLICATION_ID       0x18    //该指纹已注册
-#define ERR_BAD_QUALITY          0x19    //指纹图像质量不好
-#define ERR_MERGE_FAIL           0x1A    //Template 合成失败
-#define ERR_NOT_AUTHORIZED       0x1B    //没有进行通讯密码确认
-#define ERR_MEMORY               0x1C    //外部 Flash 烧写出错
-#define ERR_INVALID_TMPL_NO      0x1D    //指定 Template 编号无效
-#define ERR_INVALID_PARAM        0x22    //使用了不正确的参数
-#define ERR_GEN_COUNT            0x25    //指纹合成个数无效
-#define ERR_INVALID_BUFFER_ID    0x26    //Buffer ID 值不正确
-#define ERR_FP_NOT_DETECTED      0x28    //采集器上没有指纹输入
-#define ERR_FP_CANCEL            0x41    //指令被取消
-#define ERR_RECV_LENGTH          0x42    //接收数据长度错误
-#define ERR_RECV_CKS             0x43    //校验码错误
-#define ERR_TIME_OUT             0x44    //采集超时
-#define ERR_GATHER_OUT           0x45    //模板采集次数超过上限
-
 public:
+  
+  enum{
+    eError
+  typedef eErrSuccess = 0x00,      //指令处理成功
+    eErrFail = 0x01,                //指令处理失败
+    eErrVerify = 0x10,              //与指定编号中 Template 的 1:1 比对失败
+    eErrIdentify =0x11,             //已进行 1:N 比对， 但相同 Template 不存在
+    eErrTmplEmpty = 0x12,           //在指定编号中不存在已注册的 Template 
+    eErrTmplNotEmpty = 0x13,        //在指定编号中已存在 Template 
+    eErrAllEmplEmpty = 0x14,        //不存在已注册的 Template 
+    eErrEmptyIDNoexist = 0x15,      //不存在可注册的 Template ID 
+    eErrBrokenIDNoexist = 0x16,     //不存在已损坏的 Template 
+    eErrInvalidTmplData = 0x17,     //指定的 Template Data 无效
+    eErrDuplicationID = 0x18,       //该指纹已注册
+    eErrBadQuality = 0x19,          //指纹图像质量不好
+    eErrMergeFail = 0x1A,           //Template 合成失败
+    eErrNotAuthorized = 0x1B,       //没有进行通讯密码确认
+    eErrMemory = 0x1C,              //外部 Flash 烧写出错
+    eErrInvalidTmplNo = 0x1D,       //指定 Template 编号无效
+    eErrInvalidParam = 0x22,        //使用了不正确的参数
+    eErrGenCount = 0x25,            //指纹合成个数无效
+    eErrInvalidBufferID = 0x26,     //Buffer ID 值不正确
+    eErrFpNotDetected = 0x28,       //采集器上没有指纹输入
+    eErrFpCancel = 0x41,            //指令被取消
+    eErrRecvLength = 0x42,          //接收数据长度错误
+    eErrRecvCks = 0x43,             //校验码错误
+    eErrTimeOut = 0x44,             //采集超时
+    eErrGatherOut = 0x45,           //模板采集次数超过上限
+  }eError_t;
+  
+  typedef enum{
+    eBreathing = 1, //呼吸
+    eFastBlink, //快闪
+    eKeepsOn, //常亮
+    eNormalClose, //常闭
+    eLEDMode5, //渐开
+    eLEDMode6, //渐关
+    eSlowBlink  //慢闪
+  }eLED_MODE_t;
+  
+  typedef enum{
+    eLEDGreen = 1, //绿色
+    eLEDRed,       //红色
+    eLEDYellow,    //黄色
+    eLEDBlue,      //蓝色
+    eLEDCyan,      //青色
+    eLEDMagenta,   //品红色
+    eLEDWhite      //白色
+  }eLED_COLOR_t;
+   
+  typedef enum{
+    e9600bps = 1,
+    e19200bps,
+    e38400bps,
+    e57600bps,
+    e115200bps,
+    e230400bps,
+    e460800bps,
+    e921600bps
+  }eDEVICE_BAUDRATE_t;
+
   DFRobot_ID809();
   ~DFRobot_ID809();
   bool begin(Stream &s_);
@@ -294,21 +298,21 @@ public:
    * @brief 采集指纹
    * @return 0(succeed) or Error Code
    */
-  uint8_t fingerprintCollection(uint16_t time);
+  uint8_t fingerprintCollection(uint16_t timeout);
   
   /**
    * @brief 保存指纹
    * @param 指纹ID
    * @return 0(succeed) or Error Code
    */
-  uint8_t storeChar(uint8_t ID);
+  uint8_t storeFingerprint(uint8_t ID);
   
   /**
    * @brief 删除指纹
    * @param 指纹ID or DELALL(全部删除)
    * @return 0(succeed) or Error Code
    */
-  uint8_t delChar(uint8_t ID);
+  uint8_t delFingerprint(uint8_t ID);
   
   /**
    * @brief 将指纹与全部指纹匹配
@@ -331,11 +335,16 @@ public:
   uint8_t match(uint8_t RamBufferID0, uint8_t RamBufferID1);
   
   /**
-   * @brief 检测指纹是否有损坏
-   * @return 高八位:数量  第八位:ID
+   * @brief 得到指纹损坏数量
+   * @return 损坏的指纹ID号
    */
-  //返回值问题，该返回什么？
-  uint16_t getBrokenID();
+  uint8_t getBrokenQuantity();
+
+  /**
+   * @brief 得到第一个损坏指纹ID
+   * @return 损坏的指纹ID号
+   */
+  uint8_t getBrokenID();
   
   /**
    * @brief 取出指纹模板，暂存到RamBuffer中
