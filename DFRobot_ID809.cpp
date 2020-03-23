@@ -38,7 +38,6 @@ uint8_t DFRobot_ID809::testConnection(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_TEST_CONNECTION, NULL, 0);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 }
@@ -254,6 +253,37 @@ uint8_t DFRobot_ID809::getEnrollCount(){
 	return ret;
 }
 
+#define  getID(A, V)  (A[0 + V/8] & (0x01 << (V & 0x07)))
+String DFRobot_ID809::getEnrolledIDList()
+{
+	char *data;
+	char IDList[80] = {0};
+	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_ENROLLED_ID_LIST, NULL, 0);
+	//LDBG("\r\n");//保证发送包是正确的
+	sendPacket(header);
+	free(header);
+	uint8_t result = responsePayload(buf);
+	//LDBG("result=");LDBG(result);
+	uint16_t dataLen = buf[0]+(buf[1]<<8)+1;
+	if((data = (char *)malloc(dataLen)) == NULL){
+		LDBG("no memory!!!\r\n");
+		while(1);
+	}
+	data[dataLen] = 0;
+	result = responsePayload(data);
+	//LDBG("result=");LDBG(result);//2个包都是正确的
+	uint8_t j = 0;
+	for(uint8_t i = 0; i < (dataLen*8); i++){
+		if(getID(data, i) != 0){
+			IDList[j] = i;
+			j++;
+		}
+	}
+	String ret=String(IDList);
+	free(data);
+	return ret;
+}
+
 uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID){
 	uint8_t data[4] = {0};
 	uint8_t ret = merge();
@@ -296,9 +326,11 @@ uint8_t DFRobot_ID809::search(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SEARCH, data, 6);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	LDBG("ret=");LDBG(ret);
 	if(ret == 0){
 		ret = buf[0];
+	}else{
+		LDBG("ret=");LDBG(ret);
+		ret = 0;
 	}
 	free(header);
 	return ret;
@@ -311,10 +343,11 @@ uint8_t DFRobot_ID809::verify(uint8_t ID){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_VERIFY, data, 4);
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
-	LDBG("ret=");LDBG(ret);
-	if(ret == 0)
-	{
+	if(ret == 0){
 		ret = buf[0];
+	}else{
+		LDBG("ret=");LDBG(ret);
+		ret = 0;
 	}
 	free(header);
 	return ret;
@@ -404,7 +437,7 @@ uint8_t DFRobot_ID809::getParam(uint8_t* data){
 	sendPacket(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0){
+	if(ret == ERR_SUCCESS){
 		ret = buf[0];
 	}
 	free(header);
@@ -425,7 +458,7 @@ uint8_t DFRobot_ID809::fingerprintCollection(uint16_t timeout){  //采集指纹
 	uint16_t i = 0;
 	while(!detectFinger()){
 		delay(10);
-		if(++i > timeout*100){
+		if(++i > timeout*10){
 			ret = ERR_TIME_OUT;
 			LDBG("采集超时");
 			LDBG("ret=");LDBG(ret);
@@ -538,7 +571,7 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
 	memcpy(packet, &header, 10);
     dataCount = readN(packet->payload, dataLen);
 	cks = packet->payload[dataLen-2]+(packet->payload[dataLen-1]<<8);
-	ret = (header.RET>>8);
+	ret = (header.RET&0xFF);
 	if(ret != 0){
 		LDBG("--ERR CODE---");
 	}

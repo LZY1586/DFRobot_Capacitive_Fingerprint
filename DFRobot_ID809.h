@@ -106,55 +106,54 @@ public:
 #define CMD_SEARCH               0X0063  //指定编号范围的1:N识别
 #define CMD_VERIFY               0X0064  //指定 RAMBUFFER 与指纹库中指定编号的模板比对
 
+
+#define ERR_SUCCESS              0x00    //指令处理成功
+#define ERR_FAIL                 0x01    //指令处理失败
+#define ERR_VERIFY               0x10    //与指定编号中 Template 的 1:1 比对失败
+#define ERR_IDENTIFY             0x11    //已进行 1:N 比对， 但相同 Template 不存在
+#define ERR_TMPL_EMPTY           0x12    //在指定编号中不存在已注册的 Template 
+#define ERR_TMPL_NOT_EMPTY       0x13    //在指定编号中已存在 Template 
+#define ERR_ALL_TMPL_EMPTY       0x14    //不存在已注册的 Template 
+#define ERR_EMPTY_ID_NOEXIST     0x15    //不存在可注册的 Template ID 
+#define ERR_BROKEN_ID_NOEXIST    0x16    //不存在已损坏的 Template 
+#define ERR_INVALID_TMPL_DATA    0x17    //指定的 Template Data 无效
+#define ERR_DUPLICATION_ID       0x18    //该指纹已注册
+#define ERR_BAD_QUALITY          0x19    //指纹图像质量不好
+#define ERR_MERGE_FAIL           0x1A    //Template 合成失败
+#define ERR_NOT_AUTHORIZED       0x1B    //没有进行通讯密码确认
+#define ERR_MEMORY               0x1C    //外部 Flash 烧写出错
+#define ERR_INVALID_TMPL_NO      0x1D    //指定 Template 编号无效
+#define ERR_INVALID_PARAM        0x22    //使用了不正确的参数
+#define ERR_GEN_COUNT            0x25    //指纹合成个数无效
+#define ERR_INVALID_BUFFER_ID    0x26    //Buffer ID 值不正确
+#define ERR_FP_NOT_DETECTED      0x28    //采集器上没有指纹输入
+#define ERR_FP_CANCEL            0x41    //指令被取消
+#define ERR_RECV_LENGTH          0x42    //接收数据长度错误
+#define ERR_RECV_CKS             0x43    //校验码错误
+#define ERR_TIME_OUT             0x44    //采集超时
+#define ERR_GATHER_OUT           0x45    //模板采集次数超过上限
+
+
 public:
   
-  enum{
-    eError
-  typedef eErrSuccess = 0x00,      //指令处理成功
-    eErrFail = 0x01,                //指令处理失败
-    eErrVerify = 0x10,              //与指定编号中 Template 的 1:1 比对失败
-    eErrIdentify =0x11,             //已进行 1:N 比对， 但相同 Template 不存在
-    eErrTmplEmpty = 0x12,           //在指定编号中不存在已注册的 Template 
-    eErrTmplNotEmpty = 0x13,        //在指定编号中已存在 Template 
-    eErrAllEmplEmpty = 0x14,        //不存在已注册的 Template 
-    eErrEmptyIDNoexist = 0x15,      //不存在可注册的 Template ID 
-    eErrBrokenIDNoexist = 0x16,     //不存在已损坏的 Template 
-    eErrInvalidTmplData = 0x17,     //指定的 Template Data 无效
-    eErrDuplicationID = 0x18,       //该指纹已注册
-    eErrBadQuality = 0x19,          //指纹图像质量不好
-    eErrMergeFail = 0x1A,           //Template 合成失败
-    eErrNotAuthorized = 0x1B,       //没有进行通讯密码确认
-    eErrMemory = 0x1C,              //外部 Flash 烧写出错
-    eErrInvalidTmplNo = 0x1D,       //指定 Template 编号无效
-    eErrInvalidParam = 0x22,        //使用了不正确的参数
-    eErrGenCount = 0x25,            //指纹合成个数无效
-    eErrInvalidBufferID = 0x26,     //Buffer ID 值不正确
-    eErrFpNotDetected = 0x28,       //采集器上没有指纹输入
-    eErrFpCancel = 0x41,            //指令被取消
-    eErrRecvLength = 0x42,          //接收数据长度错误
-    eErrRecvCks = 0x43,             //校验码错误
-    eErrTimeOut = 0x44,             //采集超时
-    eErrGatherOut = 0x45,           //模板采集次数超过上限
-  }eError_t;
-  
   typedef enum{
-    eBreathing = 1, //呼吸
-    eFastBlink, //快闪
-    eKeepsOn, //常亮
-    eNormalClose, //常闭
-    eLEDMode5, //渐开
-    eLEDMode6, //渐关
-    eSlowBlink  //慢闪
+    eBreathing = 1,  //呼吸
+    eFastBlink,      //快闪
+    eKeepsOn,        //常亮
+    eNormalClose,    //常闭
+    eFadeIn,         //渐开
+    eFadeOut,        //渐关
+    eSlowBlink       //慢闪
   }eLED_MODE_t;
   
   typedef enum{
-    eLEDGreen = 1, //绿色
-    eLEDRed,       //红色
-    eLEDYellow,    //黄色
-    eLEDBlue,      //蓝色
-    eLEDCyan,      //青色
-    eLEDMagenta,   //品红色
-    eLEDWhite      //白色
+    eLEDGreen = 1,   //绿色
+    eLEDRed,         //红色
+    eLEDYellow,      //黄色
+    eLEDBlue,        //蓝色
+    eLEDCyan,        //青色
+    eLEDMagenta,     //品红色
+    eLEDWhite        //白色
   }eLED_COLOR_t;
    
   typedef enum{
@@ -174,7 +173,7 @@ public:
   
   /**
    * @brief 测试模块是否正常连接
-   * @return 0(succeed) or 1(defeated)
+   * @return 0(succeed) or Error Code
    */
   uint8_t testConnection();
   
@@ -272,7 +271,7 @@ public:
   
   /**
    * @brief 检测是否有手指触碰
-   * @return 0(succeed) or Error Code
+   * @return 1(有手指) or 0(无手指)
    */
   uint8_t detectFinger();
   
@@ -293,6 +292,10 @@ public:
    * @return 注册用户数量 or Error Code
    */
   uint8_t getEnrollCount();
+  
+ 
+  //获取已注册用户ID
+   String getEnrolledIDList();
   
   /**
    * @brief 采集指纹
@@ -360,10 +363,6 @@ public:
    */
   uint8_t enterStandbyState();
   
-  /*  
-  //获取已注册用户ID
-   getEnrolledIDList();
-  */
   bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
 protected:
    /**

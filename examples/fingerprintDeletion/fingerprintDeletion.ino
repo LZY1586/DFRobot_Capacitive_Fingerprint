@@ -1,5 +1,5 @@
 /*!
- * @file fingerprintDeletion.ino.ino
+ * @file fingerprintDeletion.ino
  * @brief 采集指纹并保存
  * @n 实验现象：检查ID是否被注册，如果已注册则删除，
                 如果未注册则提示ID未注册
@@ -11,7 +11,7 @@
  * @get from https://www.dfrobot.com
  * @url https://github.com/DFRobot/DFRobot_SHT3x
 */
-include <DFRobot_ID809.h>
+#include <DFRobot_ID809.h>
 
 #define FINGERPRINTID 1   //待删除指纹的编号
 
@@ -27,7 +27,7 @@ void setup(){
   /*等待Serial打开*/
   while(!Serial);
   /*测试设备与主控是否能正常通讯*/
-  while(!finger.testConnection()){
+  while(finger.testConnection()){
     Serial.println("与设备通讯失败，请检查接线");
     delay(1000);
   }
@@ -44,5 +44,6 @@ void loop(){
   }else{
     Serial.println("ID未注册");
   }
+  Serial.println("-----------------------------");
   delay(1000);
 }

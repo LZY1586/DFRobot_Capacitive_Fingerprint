@@ -27,7 +27,7 @@ void setup(){
   /*等待Serial打开*/
   while(!Serial);
   /*测试设备与主控是否能正常通讯*/
-  while(!finger.testConnection()){
+  while(finger.testConnection()){
     Serial.println("与设备通讯失败，请检查接线");
     delay(1000);
   }
@@ -36,47 +36,51 @@ void setup(){
 uint8_t ID,i,ret;
 
 void loop(){
-  //设置模块ID号为1
+  /*设置模块ID号，可设置值1-255*/
   //setDeviceID(1);
   Serial.print("模块ID为:");
-  //读取模块ID
+  /*读取模块ID*/
   Serial.println(finger.getDeviceID());
   
-  //设置模块安全等级3
+  /*设置模块安全等级，可设置值1-5，默认安全等级3*/
   //setSecurityLevel(3);
   Serial.print("模块安全等级为:");
-  //读取模块安全等级
+  /*读取模块安全等级*/
   Serial.println(finger.getSecurityLevel());
   
-  //设置模块波特率115200
-  //setBaudrate(e115200bps);
+  /*设置模块波特率，可设置范围如下所示：
+    e9600bps    e19200bps   e38400bps   e57600bps
+    e115200bps  e230400bps  e460800bps  e921600bps
+   */
+  //setBaudrate(finger.e115200bps);
   Serial.print("模块波特率为:");
-  //读取模块波特率
+  /*读取模块波特率*/
   Serial.println(finger.getBaudrate());
   
-  //开启自学功能
+  /*设置模块自学功能，1(ON) 0(OFF)*/
   //setAutoLearn(1);
   Serial.print("模块自学功能:");
-  //读取模块自学功能状态
+  /*读取模块自学功能状态*/
   Serial.println(finger.getAutoLearn());
   
-  //设置模块序列号
+  /*设置模块序列号,序列号字符数必须小于15个*/
   //setModuleSN("DFRobot");
   Serial.print("模块序列号为:");
-  //读取模块序列号
+  /*读取模块序列号*/
   Serial.println(finger.getModuleSN());
   
   Serial.print("模块内部已注册指纹数量:");
-  //获取注册用户数量
+  /*获取注册用户数量*/
   Serial.println(finger.getEnrollCount());
-  //获取用户列表
+  /*获取用户列表*/
   //API待写
   
   Serial.print("指纹损坏数量:");
-  //得到指纹损坏数量
+  /*获取损坏的指纹数量*/
   Serial.println(finger.getBrokenQuantity());
-  //得到第一个损坏指纹ID
+  /*获取第一个损坏的指纹ID号*/
   //finger.getBrokenID();
+  Serial.println("-----------------------------");
 
   delay(1000);
 }
