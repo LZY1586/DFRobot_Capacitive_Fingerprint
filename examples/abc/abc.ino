@@ -38,8 +38,8 @@ void setup(){
   }
 }
 
-unsigned long time;
-uint8_t wakeUpFlag = 0;  //指纹模块唤醒标志位
+unsigned long time = 0;
+uint8_t wakeUpFlag = 1;  //指纹模块唤醒标志位
 
 void loop(){
   if(digitalRead(WAKEUP)){
@@ -82,7 +82,7 @@ void loop(){
 //匹配指纹
 void fingerprintMatching(){
   /*将采集到的指纹与指纹库中的所有指纹对比，成功返回指纹编号，失败返回0*/
-  ret = finger.search();
+  uint8_t ret = finger.search();
   
   if(ret){
     /*设置指纹灯环模式、颜色和闪烁次数，
@@ -127,7 +127,7 @@ void fingerprintRegistration(){
     Serial.println("次指纹采样");
     Serial.println("请按下手指");
     /*采集指纹图像，超过5S没按下手指则采集超时*/
-    if((ret = finger.fingerprintCollection(/*timeout = */5)) == 0){
+    if(finger.fingerprintCollection(/*timeout = */5) == 0){
       /*设置指纹灯环为黄色快闪3次*/
       finger.LEDCtrl(finger.eFastBlink, finger.eLEDYellow, /*flashing number = */3);
       Serial.println("采集成功");
